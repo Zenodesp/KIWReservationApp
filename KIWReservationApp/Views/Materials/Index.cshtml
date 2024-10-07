@@ -1,0 +1,185 @@
+﻿@model IEnumerable<KIWReservationApp.Models.Material>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create">Create New</a>
+        <a asp-action="Upload">Upload Excel layout</a>
+    }
+    
+    
+</p>
+
+@* filter dropdown list *@
+
+<form asp-action="Filter" method="post">
+	<select name="selectedItem">
+        <option value="All">All</option>
+        <option value="Boek">Boek</option>
+        <option value="Strip">Strip</option>
+        <option value="CD">CD</option>
+        <option value="Friemel">Friemel</option>
+        <option value="Spelmateriaal">Spelmateriaal - Studie</option>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <option value="Spelmateriaal">Spelmateriaal - Overig</option>
+            <option value="Coördinatieboek">Coördinatieboek</option>
+        }
+        
+
+        @* if you want to instead populate the dropdown filter with types already present in the database, remove the comment brackets from the following code:*@
+
+        @* @foreach (var item in Model)
+		{
+            
+
+            if (!ViewData.ContainsKey(item.Type))
+			{
+				
+				<option value="@item.Type.ToLower()">@item.Type</option>
+				ViewData[item.Type] = item.Type;
+			}
+			
+		}		 *@
+	</select>
+    <input type="submit" value="Filter" />
+</form>
+
+
+<form asp-action="Search" method="post">
+	<input type="text" name="searchItem" />
+	<input type="submit" value="Search" />
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+				@Html.DisplayNameFor(model => model.SerialNumber)
+            </th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>
+                    <p>QR-Code</p>
+                </th>
+            }
+            
+            <th>
+                @Html.DisplayNameFor(model => model.IsReserved)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPickedUp)
+            </th>
+            @if(User.IsInRole("Admin"))
+			{
+				<th>
+					@Html.DisplayNameFor(model => model.UserReserved)
+				</th>
+			}
+            <th>
+                @Html.DisplayNameFor(model => model.PickupTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReturnTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsReturned)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+				@Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SerialNumber)
+            </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    @if (System.IO.File.Exists("wwwroot/images/qrCode" + @item.Id + ".png"))
+                    {
+                        <td>
+
+                            <img src="@Url.Content("~/images/qrCode" + @item.Id + ".png")" width="150" height="150" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <p>QR code not generated</p>
+                        </td>
+                    }
+                }
+                <td>
+				@Html.DisplayFor(modelItem => item.IsReserved)
+            </td>
+            @if(item.IsReserved && item.PickupTime < DateTime.Now)
+			{
+				item.IsPickedUp = true;
+                }
+                else
+                {
+                    item.IsPickedUp = false;
+                }
+                <td>
+                @Html.DisplayFor(modelItem => item.IsPickedUp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PickupTime)
+            </td>
+            @if(User.IsInRole("Admin"))
+			{
+				<td>
+					@Html.DisplayFor(modelItem => item.UserReserved)
+				</td>
+			}
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnTime)
+            </td>
+            <td>
+				@Html.DisplayFor(modelItem => item.IsReturned)
+            </td>
+            <td>
+                @if(User.IsInRole("Admin")){
+                
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
+                    @if (!System.IO.Directory.Exists("wwwroot/images/qrCode" + @item.Id + ".png"))
+                    {
+                        <a asp-action="generateQrCode" asp-route-id="@item.Id">Generate QR code</a>
+
+                    } 
+
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
+                }
+                @if (!item.IsReserved)
+				{
+					<a asp-action="PickUp" asp-route-id="@item.Id">Pick Up</a>
+                    }
+                    else if(item.PickupTime < DateTime.Now){
+                       
+                    <a asp-action="Return" asp-route-id="@item.Id">Return</a>
+                }
+                
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

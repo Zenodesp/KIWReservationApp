@@ -1,0 +1,70 @@
+﻿@model KIWReservationApp.Models.Material
+@{
+    ViewData["Title"] = "PickUp";
+}
+
+<h1>PickUp</h1>
+
+<h2>Do you want to pick up this item?</h2>
+
+<div>
+<h4>Material</h4>
+	<hr />
+	<form asp-action="PickUp">
+	<dl class="row">
+		<dt class = "col-sm-2">
+			@Html.DisplayNameFor(model => model.Type)
+		</dt>
+		<dd class = "col-sm-10">
+			@Html.DisplayFor(model => model.Type)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Name)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Name)
+		</dd>
+		<dt class = "col-sm-2">
+			@Html.DisplayNameFor(model => model.PickupTime)
+		</dt>
+		<dd class = "col-sm-10">
+				<div class="form-group">
+
+					<input asp-for="PickupTime" class="form-control" />
+					<span asp-validation-for="PickupTime" class="text-danger"></span>
+				</div>
+		</dd>
+		<dt class = "col-sm-2">
+			@Html.DisplayNameFor(model => model.IsPickedUp)
+		</dt>
+		<dd class = "col-sm-10">
+			@Html.DisplayFor(model => model.IsPickedUp)
+		</dd>
+		<dt class = "col-sm-2">
+			@Html.DisplayNameFor(model => model.ReturnTime)
+		</dt>
+		<dd class = "col-sm-10">
+			<div class="form-group">
+
+				<input asp-for="ReturnTime" class="form-control" />
+				<span asp-validation-for="ReturnTime" class="text-danger"></span>
+			</div>
+		</dd>
+		<dt class = "col-sm-2">
+			@Html.DisplayNameFor(model => model.IsReturned)
+		</dt>
+		<dd class = "col-sm-10">
+			@Html.DisplayFor(model => model.IsReturned)
+		</dd>
+	</dl>
+	
+	
+		<input type="hidden" value="@Model.Id" asp-for="Id" />
+		<input type="hidden" value="@Model.Type" asp-for="Type" />
+		<input type="hidden" value="@Model.Name" asp-for="Name" />
+		<input type="hidden" value="@Model.IsPickedUp" asp-for="IsPickedUp" />
+		<input type="hidden" value="@Model.IsReturned" asp-for="IsReturned" />
+		<input type="submit" value="Pick Up" class="btn btn-danger" /> |
+		<a asp-action="Index">Back to List</a>
+	</form>
+</div>
